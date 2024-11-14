@@ -1,6 +1,5 @@
-path: /data/ephemeral/home/data/train/yolo
-train : /data/ephemeral/home/data/train/yolo/images
-val : /data/ephemeral/home/data/train/yolo/images
+train : /data/ephemeral/home/data/train_fold_1/yolo/images
+val : /data/ephemeral/home/data/val_fold_1/yolo/images
 
 names:
   0: finger-1
