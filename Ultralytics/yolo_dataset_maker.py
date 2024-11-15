@@ -36,8 +36,6 @@ def make_yolo_dataset(original_img_path, original_json_path, output_path):
             # json 파일에서 이미지 크기 가져오기
             with open(json_path, 'r') as f:
                 json_data = json.load(f)
-                img_width = json_data['metadata']['width']
-                img_height = json_data['metadata']['height']
                 
             with open(txt_path, 'w') as f:
                 for polygon in json_data['annotations']:
@@ -53,14 +51,14 @@ def make_yolo_dataset(original_img_path, original_json_path, output_path):
                     line = str(label_map[polygon['label']])
                     for point in points:
                         # 좌표를 0~1 사이의 값으로 정규화
-                        normalized_x = point[0] / img_width
-                        normalized_y = point[1] / img_height
+                        normalized_x = point[0] / 2048
+                        normalized_y = point[1] / 2048
                         line += f" {normalized_x:.6f} {normalized_y:.6f}"
                     f.write(line + '\n')
     
-original_img_path = "/data/ephemeral/home/data/train_fold_2/DCM"
-original_json_path = "/data/ephemeral/home/data/train_fold_2/outputs_json"
-output_path = "/data/ephemeral/home/data/train_fold_2/yolo"
+original_img_path = "/data/ephemeral/home/data/val_fold_1/DCM"
+original_json_path = "/data/ephemeral/home/data/val_fold_1/outputs_json"
+output_path = "/data/ephemeral/home/data/val_fold_1/yolo"
 
 os.makedirs(output_path+"/images", exist_ok=True)
 os.makedirs(output_path+"/labels", exist_ok=True)    
