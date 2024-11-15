@@ -32,7 +32,8 @@ class Trainer:
                  criterion: torch.nn.modules.loss._Loss,
                  max_epoch: int,
                  save_dir: str,
-                 val_interval: int):
+                 val_interval: int,
+                 early_stopping_patience=10):
         self.model = model
         self.device = device
         self.train_loader = train_loader
@@ -44,6 +45,8 @@ class Trainer:
         self.save_dir = save_dir
         self.threshold = threshold
         self.val_interval = val_interval
+        self.early_stopping_patience = early_stopping_patience
+        self.early_stopping_counter = 0
 
 
     def save_model(self, epoch, dice_score, before_path):
@@ -174,5 +177,13 @@ class Trainer:
                     print(f"Best performance at epoch: {epoch}, {best_dice:.4f} -> {avg_dice:.4f}\n")
                     best_dice = avg_dice
                     before_path = self.save_model(epoch, best_dice, before_path)
+                    self.early_stopping_counter = 0  # Reset counter when performance improves
+                else:
+                    self.early_stopping_counter += 1  # Increment counter when no improvement
+                    
+                # Early stopping check
+                if self.early_stopping_counter >= self.early_stopping_patience:
+                    print(f"\nEarly stopping triggered after {epoch} epochs without improvement")
+                    break
 
             self.scheduler.step()
