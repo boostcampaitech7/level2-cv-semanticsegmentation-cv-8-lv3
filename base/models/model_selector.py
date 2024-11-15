@@ -1,4 +1,6 @@
 from .base_model import UnetModel
+import segmentation_models_pytorch as smp
+
 
 class ModelSelector():
     """
@@ -14,4 +16,8 @@ class ModelSelector():
         }
 
     def get_model(self, model_name, **model_parameter):
-        return self.model_classes.get(model_name, None)(**model_parameter)
+        model = smp.create_model(
+            **model_parameter
+        )
+        return model
+        # return self.model_classes.get(model_name, None)(**model_parameter)
