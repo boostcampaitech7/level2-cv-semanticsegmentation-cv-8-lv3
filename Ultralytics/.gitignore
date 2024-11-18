@@ -1,0 +1,4 @@
+/runs
+/yolo11x-seg
+/handbone-segmentation
+*.csv
