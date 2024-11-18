@@ -6,7 +6,7 @@ import random
 import warnings
 import numpy as np
 import albumentations as A
-
+import cv2
 import argparse
 import torch.optim as optim
 
@@ -21,6 +21,20 @@ from scheduler.scheduler_selector import SchedulerSelector
 from models.model_selector import ModelSelector
 
 warnings.filterwarnings('ignore')
+
+class RegionSpecificZoom(A.ImageOnlyTransform):
+    def __init__(self, zoom_factor=0.7, always_apply=False, p=0.5):
+        super().__init__(always_apply=always_apply, p=p)
+        self.zoom_factor = zoom_factor
+
+    def apply(self, img, **params):
+        h, w, c = img.shape if len(img.shape) == 3 else (*img.shape, 1)
+        crop_h, crop_w = int(h * self.zoom_factor), int(w * self.zoom_factor)
+        start_x = (w - crop_w) // 2
+        start_y = (h - crop_h) // 2
+        cropped_img = img[start_y:start_y + crop_h, start_x:start_x + crop_w]
+        zoomed_img = cv2.resize(cropped_img, (w, h), interpolation=cv2.INTER_LINEAR)
+        return zoomed_img
 
 def set_seed(seed):
     torch.manual_seed(seed)
@@ -59,6 +73,8 @@ def main(cfg):
 
     transform = [getattr(A, aug)(**params) 
                                          for aug, params in cfg.transform.items()]
+    # RegionSpecificZoom 추가
+    transform.append(RegionSpecificZoom(zoom_factor=0.5, p=0.5))
 
     train_dataset = XRayDataset(fnames,
                                 labels,
