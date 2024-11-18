@@ -1,7 +1,9 @@
 import wandb
+import os
+
 
 def set_wandb(configs):
-    wandb.login(key=configs['api_key'])
+    wandb.login(key=os.getenv(configs['api_key']))
     wandb.init(
         entity=configs['team_name'],
         project=configs['project_name'],

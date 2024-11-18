@@ -3,9 +3,8 @@ image_root: /data/ephemeral/home/data/train/DCM
 label_root: /data/ephemeral/home/data/train/outputs_json
 
 # 모델명 및 사전 학습 여부
-model_name: Unet # 여기 부분은 필요 없음
 model_parameter:
-  arch: UPerNet
+  arch: fpn
   encoder_name: mit_b5
   in_channels : 3
   classes: 29
@@ -55,7 +54,7 @@ threshold: 0.5
 save_dir: ./checkpoints/Unet
 
 # wandb
-api_key: 5235ec2371e34b71481b790ec6f13bb16a0114e6
+api_key: kgs_API_KEY
 team_name: tjwlssla1-gachon-university
 project_name: handbone
 experiment_detail: upnet
