@@ -8,10 +8,9 @@ parser.add_argument('--cfg', type=str, required=True, help='config 파일의 경
 args = parser.parse_args()
 
 # wandb 초기화
-wandb.init(project="handbone-semantic-segmentation")
+# wandb.init(project="handbone-semantic-segmentation")
 
 model = YOLO("yolo11x-seg.pt")
 
-# wandb 로깅 활성화
-model.train(cfg=args.cfg, project="handbone-semantic-segmentation")
-
+result = model.train(cfg=args.cfg)
+model.val(cfg=args.cfg)

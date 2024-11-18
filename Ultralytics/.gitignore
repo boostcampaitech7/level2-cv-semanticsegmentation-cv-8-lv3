@@ -1,3 +1,4 @@
 /runs
-/handbone-semantic-segmentation
+/yolo11x-seg
+/handbone-segmentation
 *.csv

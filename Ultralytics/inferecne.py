@@ -53,7 +53,7 @@ def run_inference(model_path, test_dir, save_path):
             for img_name in os.listdir(folder_path):
                 if img_name.endswith(('.jpg', '.png', '.jpeg')):
                     test_images.append(os.path.join(folder, img_name))
-    
+
     # 결과를 저장할 리스트
     results_list = []
     
@@ -99,7 +99,6 @@ def run_inference(model_path, test_dir, save_path):
     
     # DataFrame 생성 및 CSV 저장
     df = pd.DataFrame(results_list)
-    # 정렬 방식 수정
     df = df.sort_values(['image_name', 'class'])
     df['class'] = pd.Categorical(df['class'], categories=class_names)
     df = df.sort_values(['image_name', 'class'])
