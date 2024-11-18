@@ -42,15 +42,15 @@ class XRayDataset(Dataset):
         for i, (x, y) in enumerate(gkf.split(fnames, ys, groups)):
             if self.is_train:
                 if i == self.validation_fold:
-                    continue
+                    continue        
                 filenames += list(fnames[y])
                 labelnames += list(labels[y])
-
             else:
                 if i != self.validation_fold:
                     continue
                 filenames = list(fnames[y])
-        labelnames = list(labels[y])
+                labelnames = list(labels[y])
+                break
 
         self.fnames = filenames
         self.labels = labelnames

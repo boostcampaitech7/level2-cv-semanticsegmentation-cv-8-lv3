@@ -3,6 +3,7 @@ image_root: /data/ephemeral/home/data/train/DCM
 label_root: /data/ephemeral/home/data/train/outputs_json
 
 # 모델명 및 사전 학습 여부
+model_name: Unet # 여기 부분은 필요 없음
 model_parameter:
   arch: fpn
   encoder_name: mit_b5
