@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from tqdm.auto import tqdm
 from datetime import timedelta
 from torch.utils.data import DataLoader
+from torch.cuda.amp import GradScaler, autocast  # AMP 관련 모듈 추가
 
 
 def dice_coef(y_true, y_pred):
@@ -33,7 +34,8 @@ class Trainer:
                  max_epoch: int,
                  save_dir: str,
                  val_interval: int,
-                 early_stopping_patience=10):
+                 early_stopping_patience=10,
+                 scaler=None):
         self.model = model
         self.device = device
         self.train_loader = train_loader
@@ -47,6 +49,7 @@ class Trainer:
         self.val_interval = val_interval
         self.early_stopping_patience = early_stopping_patience
         self.early_stopping_counter = 0
+        self.scaler = scaler
 
 
     def save_model(self, epoch, dice_score, before_path):
@@ -70,12 +73,17 @@ class Trainer:
         with tqdm(total=len(self.train_loader), desc=f"[Training Epoch {epoch}]", disable=False) as pbar:
             for images, masks in self.train_loader:
                 images, masks = images.to(self.device), masks.to(self.device)
-                outputs = self.model(images)
-
-                loss = self.criterion(outputs, masks)
                 self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
+
+                with autocast():
+                    outputs = self.model(images)
+
+                    loss = self.criterion(outputs, masks)
+                self.scaler.scale(loss).backward()
+                # loss.backward()
+                self.scaler.step(self.optimizer)
+                # self.optimizer.step()
+                self.scaler.update()
 
                 total_loss += loss.item()
                 pbar.update(1)
@@ -102,17 +110,18 @@ class Trainer:
             with tqdm(total=len(self.val_loader), desc=f'[Validation Epoch {epoch}]', disable=False) as pbar:
                 for images, masks in self.val_loader:
                     images, masks = images.to(self.device), masks.to(self.device)
-                    outputs = self.model(images)
+                    with autocast():
+                        outputs = self.model(images)
 
-                    output_h, output_w = outputs.size(-2), outputs.size(-1)
-                    mask_h, mask_w = masks.size(-2), masks.size(-1)
+                        output_h, output_w = outputs.size(-2), outputs.size(-1)
+                        mask_h, mask_w = masks.size(-2), masks.size(-1)
 
-                    # gt와 prediction의 크기가 다른 경우 prediction을 gt에 맞춰 interpolation 합니다.
-                    if output_h != mask_h or output_w != mask_w:
-                        outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
-                    
-                    loss = self.criterion(outputs, masks)
-                    total_loss += loss.item()
+                        # gt와 prediction의 크기가 다른 경우 prediction을 gt에 맞춰 interpolation 합니다.
+                        if output_h != mask_h or output_w != mask_w:
+                            outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
+                        
+                        loss = self.criterion(outputs, masks)
+                        total_loss += loss.item()
 
                     outputs = torch.sigmoid(outputs)
                     outputs = (outputs > self.threshold).detach().cpu()

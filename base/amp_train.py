@@ -11,7 +11,7 @@ import argparse
 import torch.optim as optim
 
 from tqdm.auto import tqdm
-from trainer import Trainer
+from amp_trainer import Trainer
 from dataset import XRayDataset
 from omegaconf import OmegaConf
 from utils.wandb import set_wandb
@@ -19,6 +19,7 @@ from torch.utils.data import DataLoader
 from loss.loss_selector import LossSelector
 from scheduler.scheduler_selector import SchedulerSelector
 from models.model_selector import ModelSelector
+from torch.cuda.amp import GradScaler, autocast
 
 warnings.filterwarnings('ignore')
 
@@ -113,6 +114,8 @@ def main(cfg):
     # loss 선택
     loss_selector = LossSelector()
     criterion = loss_selector.get_loss(cfg.loss_name, **cfg.loss_parameter)
+    #AMP 관련 코드 추가
+    scaler = GradScaler()
 
     trainer = Trainer(
         model=model,
@@ -125,7 +128,8 @@ def main(cfg):
         criterion=criterion,
         max_epoch=cfg.max_epoch,
         save_dir=cfg.save_dir,
-        val_interval=cfg.val_interval
+        val_interval=cfg.val_interval,
+        scaler=scaler
     )
 
     trainer.train()
