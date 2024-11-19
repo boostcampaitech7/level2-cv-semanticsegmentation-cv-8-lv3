@@ -170,7 +170,7 @@ class Trainer:
             wandb.log({
                 "Epoch" : epoch,
                 "Train Loss" : train_loss,
-                "Learning Rate": self.scheduler.get_last_lr()[0]
+                "Learning Rate": self.optimizer.param_groups[0]['lr']
             }, step=epoch)
 
             # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
@@ -195,4 +195,8 @@ class Trainer:
                     print(f"\nEarly stopping triggered after {epoch} epochs without improvement")
                     break
 
-            self.scheduler.step()
+            if isinstance(self.scheduler, optim.lr_scheduler.ReduceLROnPlateau):
+                if (epoch + 1) % self.val_interval == 0:
+                    self.scheduler.step(avg_dice)
+            else:
+                self.scheduler.step()

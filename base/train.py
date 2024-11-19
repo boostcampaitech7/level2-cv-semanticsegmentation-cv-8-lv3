@@ -104,7 +104,7 @@ def main(cfg):
     model.to(device)
 
     # optimizer는 고정
-    optimizer = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
+    optimizer = Lion(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
     
     # scheduler 선택
     scheduler_selector = SchedulerSelector(optimizer)

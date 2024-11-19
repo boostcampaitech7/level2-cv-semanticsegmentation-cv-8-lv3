@@ -41,7 +41,8 @@ scheduler_name: ReduceLROnPlateau
 
 # scheduler 필요한 parameter -> dict 형태로 작성
 scheduler_parameter:
-  factor: 0.1
+  mode: max
+  patience: 16
 # random seed값
 seed: 42
 
