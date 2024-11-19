@@ -8,6 +8,10 @@ def multi_step_lr(optimizer, **scheduler_parameter):
 def cosine_annealing_lr(optimizer, **scheduler_parameter):
     return lr_scheduler.CosineAnnealingLR(optimizer, **scheduler_parameter)
 
+# ReduceLROnPlateau
+def reduce_lr_on_plateau(optimizer, **scheduler_parameter):
+    return lr_scheduler.ReduceLROnPlateau(optimizer, **scheduler_parameter)
+
 class SchedulerSelector():
     """
     scheduler를 새롭게 추가하기 위한 방법
@@ -20,7 +24,8 @@ class SchedulerSelector():
     def __init__(self, optimizer) -> None:
         self.scheduler_classes = {
             "MultiStepLR" : multi_step_lr,
-            "CosineAnnealingLR" : cosine_annealing_lr
+            "CosineAnnealingLR" : cosine_annealing_lr,
+            "ReduceLROnPlateau" : reduce_lr_on_plateau
         }
         self.optimizer = optimizer
 
