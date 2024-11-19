@@ -3,31 +3,29 @@ image_root: /data/ephemeral/home/data/train/DCM
 label_root: /data/ephemeral/home/data/train/outputs_json
 
 # 모델명 및 사전 학습 여부
-model_name: base # 여기 부분은 필요 없음
+model_name: bright_contrast # 여기 부분은 필요 없음
 model_parameter:
-  arch: UnetPlusPlus
-  encoder_name: vgg19_bn
+  arch: FPN
+  encoder_name: efficientnet-b0
   in_channels : 3
   classes: 29
 
 # batch_size
-train_batch_size: 2
-val_batch_size: 2
+train_batch_size: 32
+val_batch_size: 32
 
 # image resize
-image_size: &image_size 1536
-# crop size
-crop_size: &crop_size 768
+image_size: &image_size 512
 
 # transform 관련
 transform:
-  CenterCrop:
-    height: *crop_size
-    width: *crop_size
-    p: 0.5
   Resize:
     width: *image_size
     height: *image_size
+  RandomBrightnessContrast:
+    brightness_limit: 0.5
+    contrast_limit: 0.5
+    p: 0.5
 
 # 학습 관련 하이퍼파라미터
 lr: 1e-3
@@ -66,10 +64,10 @@ val_interval: 5
 threshold: 0.5
 
 # checkpoint 저장 경로
-save_dir: ./checkpoints/base
+save_dir: ./checkpoints/bright_contrast
 
 # wandb
 api_key: seo_API_KEY
 team_name: tjwlssla1-gachon-university
-project_name: base
-experiment_detail: base
+project_name: augmentation
+experiment_detail: bright_contrast
