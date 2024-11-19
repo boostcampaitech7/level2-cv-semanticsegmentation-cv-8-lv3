@@ -5,17 +5,17 @@ label_root: /data/ephemeral/home/data/train/outputs_json
 # 모델명 및 사전 학습 여부
 model_name: base # 여기 부분은 필요 없음
 model_parameter:
-  arch: UnetPlusPlus
-  encoder_name: vgg19_bn
+  arch: FCN8s
+  encoder_name: efficientnet-b0
   in_channels : 3
   classes: 29
 
 # batch_size
-train_batch_size: 2
-val_batch_size: 2
+train_batch_size: 16
+val_batch_size: 16
 
 # image resize
-image_size: &image_size 1536
+image_size: &image_size 512
 
 # transform 관련
 transform:
@@ -27,7 +27,7 @@ transform:
 lr: 1e-3
 weight_decay: 1e-6
 
-max_epoch: &max_epoch 50 
+max_epoch: &max_epoch 100 
 early_stopping_patience: 10
 
 # loss 관련 설정
