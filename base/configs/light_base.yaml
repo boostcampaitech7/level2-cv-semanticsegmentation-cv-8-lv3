@@ -3,28 +3,22 @@ image_root: /data/ephemeral/home/data/train/DCM
 label_root: /data/ephemeral/home/data/train/outputs_json
 
 # 모델명 및 사전 학습 여부
-model_name: center_crop # 여기 부분은 필요 없음
+model_name: base # 여기 부분은 필요 없음
 model_parameter:
-  arch: UnetPlusPlus
-  encoder_name: vgg19_bn
+  arch: FPN
+  encoder_name: efficientnet-b0
   in_channels : 3
   classes: 29
 
 # batch_size
-train_batch_size: 2
-val_batch_size: 2
+train_batch_size: 32
+val_batch_size: 32
 
 # image resize
-image_size: &image_size 1536
-# crop size
-crop_size: &crop_size 768
+image_size: &image_size 512
 
 # transform 관련
 transform:
-  CenterCrop:
-    height: *crop_size
-    width: *crop_size
-    p: 0.5
   Resize:
     width: *image_size
     height: *image_size
@@ -69,7 +63,7 @@ threshold: 0.5
 save_dir: ./checkpoints/base
 
 # wandb
-api_key: seo_API_KEY
+api_key: kgs_API_KEY
 team_name: tjwlssla1-gachon-university
-project_name: center_crop
-experiment_detail: center_crop
+project_name: base
+experiment_detail: base_train

@@ -170,7 +170,7 @@ class Trainer:
             wandb.log({
                 "Epoch" : epoch,
                 "Train Loss" : train_loss,
-                "Learning Rate": self.scheduler.get_last_lr()[0]
+                "Learning Rate": self.scheduler._last_lr[0] if hasattr(self.scheduler, 'get_last_lr') else self.optimizer.param_groups[0]['lr']
             }, step=epoch)
 
             # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
@@ -195,4 +195,8 @@ class Trainer:
                     print(f"\nEarly stopping triggered after {epoch} epochs without improvement")
                     break
 
-            self.scheduler.step()
+            # scheduler 종류에 따라 step 함수를 호출합니다.
+            if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                self.scheduler.step(train_loss)
+            else:
+                self.scheduler.step()
