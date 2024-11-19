@@ -10,6 +10,9 @@ model_parameter:
   in_channels : 3
   classes: 29
 
+# amp 사용 여부
+amp: True
+
 # batch_size
 train_batch_size: 2
 val_batch_size: 2
@@ -28,7 +31,7 @@ lr: 1e-3
 weight_decay: 1e-6
 
 max_epoch: &max_epoch 100 
-early_stopping_patience: 10
+early_stopping_patience: 4
 
 # loss 관련 설정
 loss_name: BCEDiceLoss 
