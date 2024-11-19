@@ -5,8 +5,13 @@ label_root: /data/ephemeral/home/data/train/outputs_json
 # 모델명 및 사전 학습 여부
 model_name: base # 여기 부분은 필요 없음
 model_parameter:
+<<<<<<< HEAD
   arch: fpn
   encoder_name: mit_b5
+=======
+  arch: UnetPlusPlus
+  encoder_name: vgg19
+>>>>>>> main
   in_channels : 3
   classes: 29
 
@@ -37,6 +42,7 @@ loss_name: BCEDiceLoss
 loss_parameter: {}
 
 # scheduler 관련 설정
+<<<<<<< HEAD
 scheduler_name: CosineAnnealingLR
 
 # scheduler 필요한 parameter -> dict 형태로 작성
@@ -44,6 +50,13 @@ scheduler_parameter:
   T_max: *max_epoch
   eta_min: 1e-6
 
+=======
+scheduler_name: ReduceLROnPlateau 
+
+# scheduler 필요한 parameter -> dict 형태로 작성
+scheduler_parameter:
+  factor: 0.1
+>>>>>>> main
 # random seed값
 seed: 42
 
@@ -53,10 +66,19 @@ val_interval: 5
 threshold: 0.5
 
 # checkpoint 저장 경로
+<<<<<<< HEAD
 save_dir: ./checkpoints/Unet
+=======
+save_dir: ./checkpoints/base
+>>>>>>> main
 
 # wandb
 api_key: seo_API_KEY
 team_name: tjwlssla1-gachon-university
+<<<<<<< HEAD
 project_name: handbone
 experiment_detail: upnet
+=======
+project_name: base
+experiment_detail: base_train
+>>>>>>> main
