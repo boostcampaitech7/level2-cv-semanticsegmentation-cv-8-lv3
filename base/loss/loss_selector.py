@@ -1,5 +1,5 @@
 from .base_loss import CustomBCEWithLogitsLoss
-
+from .bce_dice_loss import BCEDiceLoss
 import segmentation_models_pytorch as smp
 
 def jaccard_loss():
@@ -33,7 +33,8 @@ class LossSelector():
             'JaccardLoss' : jaccard_loss,
             "TverskyLoss" : tversky_loss,
             "FocalLoss" : focal_loss,
-            "MccLoss" : mcc_loss
+            "MccLoss" : mcc_loss,
+            "BCEDiceLoss" : BCEDiceLoss
         }
     
     def get_loss(self, loss_name, **loss_parameter):

@@ -3,19 +3,19 @@ image_root: /data/ephemeral/home/data/train/DCM
 label_root: /data/ephemeral/home/data/train/outputs_json
 
 # 모델명 및 사전 학습 여부
-model_name: Unet # 여기 부분은 필요 없음
+model_name: base # 여기 부분은 필요 없음
 model_parameter:
-  arch: unet
-  encoder_name: timm-regnetx_320
+  arch: UnetPlusPlus
+  encoder_name: vgg19
   in_channels : 3
   classes: 29
 
 # batch_size
-train_batch_size: 4
-val_batch_size: 4
+train_batch_size: 2
+val_batch_size: 2
 
 # image resize
-image_size: &image_size 512
+image_size: &image_size 1536
 
 # transform 관련
 transform:
@@ -27,22 +27,21 @@ transform:
 lr: 1e-3
 weight_decay: 1e-6
 
-max_epoch: &max_epoch 40
+max_epoch: &max_epoch 100 
+early_stopping_patience: 10
 
 # loss 관련 설정
-loss_name: DiceLoss
+loss_name: BCEDiceLoss 
 
 # loss에 필요한 parameter -> dict 형태로 작성
 loss_parameter: {}
 
 # scheduler 관련 설정
-scheduler_name: MultiStepLR
+scheduler_name: ReduceLROnPlateau 
 
 # scheduler 필요한 parameter -> dict 형태로 작성
 scheduler_parameter:
-  milestones: [20, 28, 36]
-  gamma: 0.1
-
+  factor: 0.1
 # random seed값
 seed: 42
 
@@ -52,10 +51,10 @@ val_interval: 5
 threshold: 0.5
 
 # checkpoint 저장 경로
-save_dir: ./checkpoints/Unet_crop
+save_dir: ./checkpoints/base
 
 # wandb
 api_key: seo_API_KEY
 team_name: tjwlssla1-gachon-university
-project_name: Region-Specific Zoom
-experiment_detail: upnet
+project_name: base
+experiment_detail: base_train
