@@ -19,6 +19,8 @@ from torch.utils.data import DataLoader
 from loss.loss_selector import LossSelector
 from scheduler.scheduler_selector import SchedulerSelector
 from models.model_selector import ModelSelector
+from lion_pytorch import Lion
+
 
 warnings.filterwarnings('ignore')
 
@@ -102,9 +104,7 @@ def main(cfg):
     model.to(device)
 
     # optimizer는 고정
-    optimizer = optim.Adam(params=model.parameters(),
-                           lr=cfg.lr,
-                           weight_decay=cfg.weight_decay)
+    optimizer = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
     
     # scheduler 선택
     scheduler_selector = SchedulerSelector(optimizer)
