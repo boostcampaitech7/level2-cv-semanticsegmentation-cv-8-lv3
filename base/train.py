@@ -9,6 +9,7 @@ import albumentations as A
 
 import argparse
 import torch.optim as optim
+from torch.cuda.amp import GradScaler, autocast
 
 from tqdm.auto import tqdm
 from trainer import Trainer
@@ -114,6 +115,9 @@ def main(cfg):
     loss_selector = LossSelector()
     criterion = loss_selector.get_loss(cfg.loss_name, **cfg.loss_parameter)
 
+    # AMP 설정
+    scaler = GradScaler() if cfg.get('amp', False) else None
+
     trainer = Trainer(
         model=model,
         device=device,
@@ -125,7 +129,8 @@ def main(cfg):
         criterion=criterion,
         max_epoch=cfg.max_epoch,
         save_dir=cfg.save_dir,
-        val_interval=cfg.val_interval
+        val_interval=cfg.val_interval,
+        scaler=scaler
     )
 
     trainer.train()
