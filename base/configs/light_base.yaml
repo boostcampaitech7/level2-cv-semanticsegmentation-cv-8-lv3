@@ -11,8 +11,8 @@ model_parameter:
   classes: 29
 
 # batch_size
-train_batch_size: 32
-val_batch_size: 32
+train_batch_size: 16
+val_batch_size: 16
 
 # image resize
 image_size: &image_size 512
@@ -65,5 +65,5 @@ save_dir: ./checkpoints/light_base
 # wandb
 api_key: seo_API_KEY
 team_name: tjwlssla1-gachon-university
-project_name: augmentation
+project_name: light_base
 experiment_detail: light_base

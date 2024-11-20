@@ -11,8 +11,8 @@ model_parameter:
   classes: 29
 
 # batch_size
-train_batch_size: 32
-val_batch_size: 32
+train_batch_size: 16
+val_batch_size: 16
 
 # image resize
 image_size: &image_size 512

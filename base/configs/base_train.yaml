@@ -21,10 +21,6 @@ crop_size: &crop_size 768
 
 # transform 관련
 transform:
-  CenterCrop:
-    height: *crop_size
-    width: *crop_size
-    p: 0.5
   Resize:
     width: *image_size
     height: *image_size
