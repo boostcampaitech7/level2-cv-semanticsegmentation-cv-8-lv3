@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from tqdm.auto import tqdm
 from datetime import timedelta
 from torch.utils.data import DataLoader
+from torch.cuda.amp import GradScaler, autocast
 
 
 def dice_coef(y_true, y_pred):
@@ -33,6 +34,7 @@ class Trainer:
                  max_epoch: int,
                  save_dir: str,
                  val_interval: int,
+                 scaler=None,
                  early_stopping_patience=10):
         self.model = model
         self.device = device
@@ -47,6 +49,7 @@ class Trainer:
         self.val_interval = val_interval
         self.early_stopping_patience = early_stopping_patience
         self.early_stopping_counter = 0
+        self.scaler = scaler
 
 
     def save_model(self, epoch, dice_score, before_path):
@@ -70,12 +73,22 @@ class Trainer:
         with tqdm(total=len(self.train_loader), desc=f"[Training Epoch {epoch}]", disable=False) as pbar:
             for images, masks in self.train_loader:
                 images, masks = images.to(self.device), masks.to(self.device)
-                outputs = self.model(images)
-
-                loss = self.criterion(outputs, masks)
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
+                
+                if self.scaler is not None:
+                    with autocast():
+                        outputs = self.model(images)
+                        loss = self.criterion(outputs, masks)
+                    
+                    self.optimizer.zero_grad()
+                    self.scaler.scale(loss).backward()
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
+                else:
+                    outputs = self.model(images)
+                    loss = self.criterion(outputs, masks)
+                    self.optimizer.zero_grad()
+                    loss.backward()
+                    self.optimizer.step()
 
                 total_loss += loss.item()
                 pbar.update(1)
@@ -102,25 +115,37 @@ class Trainer:
             with tqdm(total=len(self.val_loader), desc=f'[Validation Epoch {epoch}]', disable=False) as pbar:
                 for images, masks in self.val_loader:
                     images, masks = images.to(self.device), masks.to(self.device)
-                    outputs = self.model(images)
-
-                    output_h, output_w = outputs.size(-2), outputs.size(-1)
-                    mask_h, mask_w = masks.size(-2), masks.size(-1)
-
-                    # gt와 prediction의 크기가 다른 경우 prediction을 gt에 맞춰 interpolation 합니다.
-                    if output_h != mask_h or output_w != mask_w:
-                        outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
                     
-                    loss = self.criterion(outputs, masks)
+                    if self.scaler is not None:
+                        with autocast():
+                            outputs = self.model(images)
+                            output_h, output_w = outputs.size(-2), outputs.size(-1)
+                            mask_h, mask_w = masks.size(-2), masks.size(-1)
+
+                            # gt와 prediction의 크기가 다른 경우 prediction을 gt에 맞춰 interpolation 합니다.
+                            if output_h != mask_h or output_w != mask_w:
+                                outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
+                            
+                            loss = self.criterion(outputs, masks)
+                    else:
+                        outputs = self.model(images)
+                        output_h, output_w = outputs.size(-2), outputs.size(-1)
+                        mask_h, mask_w = masks.size(-2), masks.size(-1)
+
+                        if output_h != mask_h or output_w != mask_w:
+                            outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
+                        
+                        loss = self.criterion(outputs, masks)
+                    
                     total_loss += loss.item()
 
                     outputs = torch.sigmoid(outputs)
-                    outputs = (outputs > self.threshold).detach().cpu()
-                    masks = masks.detach().cpu()
-
+                     ## Dice 계산과정을 gpu에서 진행하도록 변경
+                    # outputs = (outputs > self.threshold).detach().cpu()
+                    # masks = masks.detach().cpu()
+                    outputs = (outputs > self.threshold)
                     dice = dice_coef(outputs, masks)
-                    dices.append(dice)
-
+                    dices.append(dice.detach().cpu())
                     pbar.update(1)
                     pbar.set_postfix(dice=torch.mean(dice).item(), loss=loss.item())
 
@@ -161,7 +186,7 @@ class Trainer:
             wandb.log({
                 "Epoch" : epoch,
                 "Train Loss" : train_loss,
-                "Learning Rate": self.scheduler.get_last_lr()[0]
+                "Learning Rate": self.scheduler._last_lr[0] if hasattr(self.scheduler, 'get_last_lr') else self.optimizer.param_groups[0]['lr']
             }, step=epoch)
 
             # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
@@ -186,4 +211,7 @@ class Trainer:
                     print(f"\nEarly stopping triggered after {epoch} epochs without improvement")
                     break
 
-            self.scheduler.step()
+            if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                self.scheduler.step(train_loss)
+            else:
+                self.scheduler.step()
