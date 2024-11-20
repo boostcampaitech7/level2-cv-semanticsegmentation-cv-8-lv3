@@ -79,13 +79,10 @@ def get_hrnet_config(model_width=48):  # 파라미터 추가
 1. HRNet 모델 파일 import를 위한 경로 설정
 import sys
 sys.path.append('./hrnet_models')  # HRNet 모델 파일이 있는 디렉토리
-
 2. HRNet 모델 가져오기
 from seg_hrnet import get_seg_model  # HRNet 모델 생성 함수
-
 3. 설정 가져오기
 config = get_hrnet_config()  # 위에서 정의한 함수로 설정 생성
-
 4. 모델 생성
 model = get_seg_model(config)  # 설정을 사용해 실제 HRNet 모델 생성
 
