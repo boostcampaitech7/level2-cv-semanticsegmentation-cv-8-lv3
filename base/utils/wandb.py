@@ -1,6 +1,8 @@
 import wandb
 import os
+import dotenv
 
+dotenv.load_dotenv()
 
 def set_wandb(configs):
     wandb.login(key=os.getenv(configs['api_key']))
