@@ -86,7 +86,6 @@ config = get_hrnet_config()  # 위에서 정의한 함수로 설정 생성
 4. 모델 생성
 model = get_seg_model(config)  # 설정을 사용해 실제 HRNet 모델 생성
 
-
 # HRNet-W48 모델 생성
 config = get_hrnet_config(model_width=48)
 model_w48 = get_seg_model(config)
