@@ -1,8 +1,8 @@
 from mmseg.registry import MODELS
 from mmseg.models.segmentors import EncoderDecoder
-from mmseg.models.decode_heads import ASPPHead, FCNHead, SegformerHead
-
+from mmseg.models.decode_heads import ASPPHead, FCNHead, SegformerHead, UPerHead
 from utils import *
+
 
 @MODELS.register_module()
 class EncoderDecoderWithoutArgmax(PostProcessResultMixin, EncoderDecoder):
@@ -13,10 +13,17 @@ class EncoderDecoderWithoutArgmax(PostProcessResultMixin, EncoderDecoder):
 class ASPPHeadWithoutAccuracy(LossByFeatMixIn, ASPPHead):
     pass
 
+
 @MODELS.register_module()
 class FCNHeadWithoutAccuracy(LossByFeatMixIn, FCNHead):
     pass
 
+
 @MODELS.register_module()
 class SegformerHeadWithoutAccuracy(LossByFeatMixIn, SegformerHead):
+    pass
+
+
+@MODELS.register_module()
+class UPerHeadWithoutAccuracy(LossByFeatMixIn, UPerHead):
     pass

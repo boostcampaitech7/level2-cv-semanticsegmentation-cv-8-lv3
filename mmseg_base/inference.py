@@ -12,7 +12,7 @@ from tqdm.auto import tqdm
 # MMEngine
 from mmengine.config import Config
 from mmengine.dataset import Compose
-from mmengine.runner import  load_checkpoint
+from mmengine.runner import load_checkpoint
 
 # Local
 from constants import *
@@ -22,18 +22,20 @@ from process_data import *
 
 IMAGE_ROOT = "/data/ephemeral/home/data/test/DCM/"
 
+
 def encode_mask_to_rle(mask):
-    '''
+    """
     mask: numpy array binary mask
     1 - mask
     0 - background
     Returns encoded run length
-    '''
+    """
     pixels = mask.flatten()
     pixels = np.concatenate([[0], pixels, [0]])
     runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
     runs[1::2] -= runs[::2]
-    return ' '.join(str(x) for x in runs)
+    return " ".join(str(x) for x in runs)
+
 
 def decode_rle_to_mask(rle, height, width):
     s = rle.split()
@@ -47,9 +49,10 @@ def decode_rle_to_mask(rle, height, width):
 
     return img.reshape(height, width)
 
+
 def _preprare_data(cfg, imgs, model):
     for t in cfg.test_pipeline:
-        if t.get('type') in ['LoadXRayAnnotations', 'TransposeAnnotations']:
+        if t.get("type") in ["LoadXRayAnnotations", "TransposeAnnotations"]:
             cfg.test_pipeline.remove(t)
 
     is_batch = True
@@ -58,7 +61,7 @@ def _preprare_data(cfg, imgs, model):
         is_batch = False
 
     if isinstance(imgs[0], np.ndarray):
-        cfg.test_pipeline[0]['type'] = 'LoadImageFromNDArray'
+        cfg.test_pipeline[0]["type"] = "LoadImageFromNDArray"
 
     # a pipeline for each inference
     pipeline = Compose(cfg.test_pipeline)
@@ -70,10 +73,11 @@ def _preprare_data(cfg, imgs, model):
         else:
             data_ = dict(img_path=img)
         data_ = pipeline(data_)
-        data['inputs'].append(data_['inputs'])
-        data['data_samples'].append(data_['data_samples'])
+        data["inputs"].append(data_["inputs"])
+        data["data_samples"].append(data_["data_samples"])
 
     return data, is_batch
+
 
 def decode_rle_to_mask(rle, height, width):
     s = rle.split()
@@ -87,6 +91,7 @@ def decode_rle_to_mask(rle, height, width):
 
     return img.reshape(height, width)
 
+
 def test(cfg, model, image_paths, thr=0.5):
     rles = []
     filename_and_class = []
@@ -94,7 +99,7 @@ def test(cfg, model, image_paths, thr=0.5):
         n_class = len(CLASSES)
 
         for step, image_path in tqdm(enumerate(image_paths), total=len(image_paths)):
-            img = cv2.imread(os.path.join(IMAGE_ROOT,image_path))
+            img = cv2.imread(os.path.join(IMAGE_ROOT, image_path))
 
             # prepare data
             data, is_batch = _preprare_data(cfg, img, model)
@@ -120,20 +125,22 @@ def test(cfg, model, image_paths, thr=0.5):
 
     return rles, filename_and_class
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('config_path', help='config file path')
-    parser.add_argument('--checkpoint', help='checkpoint path', default='iter_16000.pth')
+    parser.add_argument("config_path", help="config file path")
+    parser.add_argument(
+        "--checkpoint", help="checkpoint path", default="iter_16000.pth"
+    )
+    parser.add_argument(
+        "--csv_path", help="output csv file path", default="submission.csv"
+    )
     args = parser.parse_args()
 
     cfg = Config.fromfile(args.config_path)
     model = MODELS.build(cfg.model)
 
-    checkpoint = load_checkpoint(
-        model,
-        args.checkpoint,
-        map_location='cpu'
-    )
+    checkpoint = load_checkpoint(model, args.checkpoint, map_location="cpu")
 
     pngs = {
         os.path.relpath(os.path.join(root, fname), start=IMAGE_ROOT)
@@ -146,12 +153,16 @@ def main():
 
     classes, filename = zip(*[x.split("_") for x in filename_and_class])
 
-    df = pd.DataFrame({
-        "image_name": filename,
-        "class": classes,
-        "rle": rles,
-    })
+    df = pd.DataFrame(
+        {
+            "image_name": filename,
+            "class": classes,
+            "rle": rles,
+        }
+    )
 
-    df.to_csv("submission.csv", index=False)
+    df.to_csv(args.csv_path, index=False)
+
+
 if __name__ == "__main__":
     main()
