@@ -3,17 +3,16 @@ import pandas as pd
 from PIL import Image
 
 def decode_rle_to_mask(rle, height, width):
-    """
-    RLE로 인코딩된 데이터를 마스크로 변환
-    """
     s = rle.split()
-    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts, lengths = map(np.asarray, (s[0::2], s[1::2]))
+    # starts와 lengths를 명시적으로 정수형으로 변환
+    starts = starts.astype(np.int32)
+    lengths = lengths.astype(np.int32)
     starts -= 1
     ends = starts + lengths
-    img = np.zeros(height * width, dtype=np.uint8)
-    for lo, hi in zip(starts, ends):
-        img[lo:hi] = 1
-    return img.reshape(height, width)
+    mask = np.zeros(height * width, dtype=np.uint8)
+    mask[np.concatenate([np.arange(start, end) for start, end in zip(starts, ends)])] = 1
+    return mask.reshape((height, width))
 
 def create_pred_mask_dict(csv_path, input_size):
     """

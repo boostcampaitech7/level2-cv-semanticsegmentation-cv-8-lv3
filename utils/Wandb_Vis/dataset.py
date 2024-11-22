@@ -3,11 +3,8 @@ import cv2
 import json
 import torch
 import numpy as np
-import os.path as osp
 import albumentations as A
-
 from torch.utils.data import Dataset
-from sklearn.model_selection import GroupKFold
 
 CLASSES = [
     'finger-1', 'finger-2', 'finger-3', 'finger-4', 'finger-5',
@@ -18,83 +15,69 @@ CLASSES = [
     'Triquetrum', 'Pisiform', 'Radius', 'Ulna',
 ]
 
-
 class XRayDataset(Dataset):
-    def __init__(self,  image_root, label_root, fold=0, transforms=None, is_train=True):
-        self.transforms = A.Compose(transforms)
+    def __init__(self, image_root, label_root, transforms=None, is_train=True):
+        self.transforms = A.Compose(transforms) if transforms else None
         self.is_train = is_train
         self.image_root = image_root
         self.label_root = label_root
-        self.validation_fold = fold
         self.class2ind = {v: i for i, v in enumerate(CLASSES)}
-        self.ind2class = {v: k for k, v in self.class2ind.items()}
         self.num_classes = len(CLASSES)
 
-        # 파일 이름 목록을 여기서 생성하도록 변경 (메모리 절약)
-        fnames = sorted([f for f in os.listdir(image_root) if f.endswith('.jpg') or f.endswith('.png')]) # 확장자에 맞춰 수정
-        labels = sorted([f for f in os.listdir(label_root) if f.endswith('.json')]) # json 확장자
+        self.image_ids = sorted([f.split('.')[0] for f in os.listdir(image_root) if f.endswith(('.jpg', '.png', '.jpeg'))])
+        self.labels = sorted([f.split('.')[0] for f in os.listdir(label_root) if f.endswith('.json')])
 
-        groups = [osp.dirname(fname) for fname in fnames]
-        ys = [0] * len(fnames)
-        gkf = GroupKFold(n_splits=5)
-
-        filenames = []
-        labelnames = []
-        for i, (x, y) in enumerate(gkf.split(fnames, ys, groups)):
-            if self.is_train:
-                if i == self.validation_fold:
-                    continue        
-                filenames += list(fnames[y])
-                labelnames += list(labels[y])
-            else:
-                if i != self.validation_fold:
-                    continue
-                filenames = list(fnames[y])
-                labelnames = list(labels[y])
-                break
-
-        self.fnames = filenames
-        self.labels = labelnames
-
+        if set(self.image_ids) != set(self.labels):
+            print("Warning: Image and Label IDs do not match!")
 
     def __len__(self):
-        return len(self.fnames)
+        return len(self.image_ids)
 
     def __getitem__(self, item):
-        image_name = self.fnames[item]
-        label_name = self.labels[item]
+        image_id = self.image_ids[item]
+        image_path = os.path.join(self.image_root, f"{image_id}.png")
+        label_path = os.path.join(self.label_root, f"{image_id}.json")
+        print(f"label_path: {label_path}")
 
-        image_path = osp.join(self.image_root, image_name)
-        label_path = osp.join(self.label_root, label_name)
+        try:
+            if not os.path.isfile(image_path) or not os.path.isfile(label_path):
+                raise FileNotFoundError(f"Missing file for ID {image_id}")
 
-        image = cv2.imread(image_path)
-        image = image / 255.  # 이미지 정규화
+            image = cv2.imread(image_path)
+            image = image / 255.0
+            label_shape = tuple(image.shape[:2]) + (self.num_classes,)
+            label = np.zeros(label_shape, dtype=np.uint8)
 
-        label_shape = tuple(image.shape[:2]) + (len(CLASSES),)
-        label = np.zeros(label_shape, dtype=np.uint8)
+            with open(label_path, "r") as f:
+                annotations = json.load(f).get("annotations", [])
+                for ann in annotations:
+                    class_ind = self.class2ind.get(ann["label"], None)
+                    if class_ind is None:
+                        continue
+                    points = np.array(ann["points"])
 
-        with open(label_path, "r") as f:
-            annotations = json.load(f)
-        annotations = annotations["annotations"]
+                    # points의 차원 확인 및 처리
+                    if points.ndim == 3:  # points가 (n, 1, 2) 형태라면 그대로 사용
+                        class_label = np.zeros(image.shape[:2], dtype=np.uint8)
+                        cv2.fillPoly(class_label, [points], 1)
+                    else:  # points의 차원이 잘못되었을 때 (예: (N, 2))
+                        points = points.reshape((-1, 1, 2))
+                        class_label = np.zeros(image.shape[:2], dtype=np.uint8)
+                        cv2.fillPoly(class_label, [points], 1)
+                    label[..., class_ind] = class_label
 
-        for ann in annotations:
-            c = ann["label"]
-            class_ind = self.class2ind[c]
-            points = np.array(ann["points"])
-            class_label = np.zeros(image.shape[:2], dtype=np.uint8)
-            cv2.fillPoly(class_label, [points], 1)
-            label[..., class_ind] = class_label
+            if self.transforms:
+                inputs = {"image": image, "mask": label} if self.is_train else {"image": image}
+                result = self.transforms(**inputs)
+                image = result["image"]
+                label = result["mask"] if self.is_train else label
 
-        if self.transforms is not None:
-            inputs = {"image": image, "mask": label} if self.is_train else {"image": image}
-            result = self.transforms(**inputs)
-            image = result["image"]
-            label = result["mask"] if self.is_train else label
+            image = torch.from_numpy(image.transpose(2, 0, 1)).float()
+            label = torch.from_numpy(label.transpose(2, 0, 1)).float()
+            return image_id, image, label
 
-        image = image.transpose(2, 0, 1)
-        label = label.transpose(2, 0, 1)
-
-        image = torch.from_numpy(image).float()
-        label = torch.from_numpy(label).float()
-
-        return image, label
+        except Exception as e:
+            print(f"Error for ID {image_id}: {e}")
+            default_image = torch.zeros((3, 512, 512), dtype=torch.float32)
+            default_label = torch.zeros((self.num_classes, 512, 512), dtype=torch.float32)
+            return image_id, default_image, default_label
