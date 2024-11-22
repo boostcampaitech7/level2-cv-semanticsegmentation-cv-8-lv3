@@ -92,7 +92,7 @@ def main(cfg):
         dataset=valid_dataset, 
         batch_size=cfg.val_batch_size,
         shuffle=False,
-        num_workers=0,
+        num_workers=4,
         drop_last=False
     )
 
@@ -105,7 +105,8 @@ def main(cfg):
     model.to(device)
 
     # optimizer는 고정
-    optimizer = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
+    # optimizer = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
     
     # scheduler 선택
     scheduler_selector = SchedulerSelector(optimizer)
