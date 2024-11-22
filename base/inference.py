@@ -94,7 +94,7 @@ if __name__=="__main__":
         dataset=test_dataset, 
         batch_size=2,
         shuffle=False,
-        num_workers=2,
+        num_workers=4,
         drop_last=False
     )
 
