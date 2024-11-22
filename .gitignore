@@ -20,3 +20,5 @@ __pycache__
 
 # wandb
 wandb/
+mmseg_base/work-dirs/
+mmseg_base/__pycache__/
