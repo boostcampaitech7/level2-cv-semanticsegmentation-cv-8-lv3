@@ -12,7 +12,7 @@ model_parameter:
 
 # batch_size
 train_batch_size: 16
-val_batch_size: 16
+val_batch_size: 2
 
 # image resize
 image_size: &image_size 512
@@ -23,7 +23,7 @@ transform:
     width: *image_size
     height: *image_size
   Rotate:
-    limit: 30
+    limit: [-10, 10]
     p: 0.5
 
 # 학습 관련 하이퍼파라미터
@@ -31,7 +31,7 @@ lr: 1e-3
 weight_decay: 1e-6
 
 max_epoch: &max_epoch 100 
-early_stopping_patience: 10
+early_stopping_patience: 3
 
 # loss 관련 설정
 loss_name: BCEDiceLoss 
@@ -59,14 +59,14 @@ seed: 42
 
 # validation 관련 인자
 val_fold: 0
-val_interval: 5
+val_interval: 3
 threshold: 0.5
 
 # checkpoint 저장 경로
-save_dir: ./checkpoints/intensity_contrast
+save_dir: ./checkpoints/rotate
 
 # wandb
 api_key: seo_API_KEY
 team_name: tjwlssla1-gachon-university
 project_name: augmentation
-experiment_detail: intensity_contrast
+experiment_detail: rotate
