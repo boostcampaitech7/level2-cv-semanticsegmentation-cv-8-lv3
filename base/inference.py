@@ -6,6 +6,7 @@ import pandas as pd
 import os.path as osp
 import albumentations as A
 import torch.nn.functional as F
+import cv2
 
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
@@ -39,6 +40,40 @@ def decode_rle_to_mask(rle, height, width):
     
     return img.reshape(height, width)
 
+def remove_small_objects(output, min_size=2000):
+    """
+    Removes small objects in a (29, W, H) boolean output based on area size.
+    
+    Args:
+        output (numpy.ndarray): Input output array of shape (29, W, H) with boolean values.
+        min_size (int): Minimum area size for objects to be retained.
+        
+    Returns:
+        numpy.ndarray: Output array of shape (29, W, H) with small objects removed.
+    """
+    # Validate the input
+    if output.dtype != bool:
+        raise ValueError("Input output must be of boolean type.")
+    
+    # Create an empty array for the cleaned output
+    cleaned_output = np.zeros_like(output, dtype=bool)
+    
+    # Process each class independently
+    for i in range(output.shape[0]):
+        # Convert boolean mask to uint8 for OpenCV
+        binary_mask = output[i].astype(np.uint8)
+        
+        # Find connected components
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(binary_mask, connectivity=8)
+        
+        # Iterate through each connected component
+        for j in range(1, num_labels):  # Label 0 is the background
+            area = stats[j, cv2.CC_STAT_AREA]
+            if area >= min_size:  # Retain only components larger than the threshold
+                cleaned_output[i][labels == j] = True
+    
+    return cleaned_output
+
 
 def inference(args, data_loader):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -58,6 +93,7 @@ def inference(args, data_loader):
                 outputs = (outputs > args.thr).detach().cpu().numpy()
                 
                 for output, image_name in zip(outputs, image_names):
+                    output = remove_small_objects(output)
                     for c, segm in enumerate(output):
                         rle = encode_mask_to_rle(segm)
                         rles.append(rle)
