@@ -8,7 +8,8 @@ model_parameter:
   arch: unet
   encoder_name: efficientnet-b7
   in_channels : 3
-  classes: 29
+  label_slice: [25]
+  classes: 1 
 
 # amp 사용 여부
 amp: True
@@ -70,10 +71,10 @@ val_interval: 3
 threshold: 0.5
 
 # checkpoint 저장 경로
-save_dir: ./checkpoints/gray_scale_2048
+save_dir: ./checkpoints/label_slice/25
 
 # wandb
-api_key: kgs_API_KEY
+api_key: mpark_API_KEY
 team_name: tjwlssla1-gachon-university
-project_name: base
-experiment_detail: base
+project_name: label_slice
+experiment_detail: base, label_slice 25

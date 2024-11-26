@@ -23,16 +23,18 @@ from models.model_selector import ModelSelector
 from lion_pytorch import Lion
 
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
+
 
 def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed) # if use multi-GPU
+    torch.cuda.manual_seed_all(seed)  # if use multi-GPU
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(seed)
     random.seed(seed)
+
 
 def setup(cfg):
     # 이미지 파일명
@@ -60,27 +62,36 @@ def main(cfg):
 
     fnames, labels = setup(cfg)
 
-    transform = [getattr(A, aug)(**params) 
-                                         for aug, params in cfg.transform.items()]
+    transform = [getattr(A, aug)(**params) for aug, params in cfg.transform.items()]
 
-    train_dataset = XRayDataset(fnames,
-                                labels,
-                                cfg.image_root,
-                                cfg.label_root,
-                                fold=cfg.val_fold,
-                                transforms=transform,
-                                is_train=True)
-    
-    valid_dataset = XRayDataset(fnames,
-                                labels,
-                                cfg.image_root,
-                                cfg.label_root,
-                                fold=cfg.val_fold,
-                                transforms=transform,
-                                is_train=False)
-    
+    label_slice = cfg.model_parameter.get(
+        "label_slice", None
+    )  # Default to None for all classes
+
+    train_dataset = XRayDataset(
+        fnames,
+        labels,
+        cfg.image_root,
+        cfg.label_root,
+        fold=cfg.val_fold,
+        transforms=transform,
+        is_train=True,
+        label_slice=label_slice,
+    )
+
+    valid_dataset = XRayDataset(
+        fnames,
+        labels,
+        cfg.image_root,
+        cfg.label_root,
+        fold=cfg.val_fold,
+        transforms=transform,
+        is_train=False,
+        label_slice=label_slice,
+    )
+
     train_loader = DataLoader(
-        dataset=train_dataset, 
+        dataset=train_dataset,
         batch_size=cfg.train_batch_size,
         shuffle=True,
         num_workers=8,
@@ -89,11 +100,11 @@ def main(cfg):
 
     # 주의: validation data는 이미지 크기가 크기 때문에 `num_wokers`는 커지면 메모리 에러가 발생할 수 있습니다.
     valid_loader = DataLoader(
-        dataset=valid_dataset, 
+        dataset=valid_dataset,
         batch_size=cfg.val_batch_size,
         shuffle=False,
         num_workers=4,
-        drop_last=False
+        drop_last=False,
     )
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -107,17 +118,19 @@ def main(cfg):
     # optimizer는 고정
     # optimizer = Lion(model.parameters(), lr=1e-4, weight_decay=1e-2)
     optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-6)
-    
+
     # scheduler 선택
     scheduler_selector = SchedulerSelector(optimizer)
-    scheduler = scheduler_selector.get_scheduler(cfg.scheduler_name, **cfg.scheduler_parameter)
-    
+    scheduler = scheduler_selector.get_scheduler(
+        cfg.scheduler_name, **cfg.scheduler_parameter
+    )
+
     # loss 선택
     loss_selector = LossSelector()
     criterion = loss_selector.get_loss(cfg.loss_name, **cfg.loss_parameter)
 
     # AMP 설정
-    scaler = GradScaler() if cfg.get('amp', False) else None
+    scaler = GradScaler() if cfg.get("amp", False) else None
 
     trainer = Trainer(
         model=model,
@@ -131,19 +144,19 @@ def main(cfg):
         max_epoch=cfg.max_epoch,
         save_dir=cfg.save_dir,
         val_interval=cfg.val_interval,
-        scaler=scaler
+        scaler=scaler,
     )
 
     trainer.train()
 
 
-if __name__=='__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=str, default="configs/base_train.yaml")
 
     args = parser.parse_args()
-    
-    with open(args.config, 'r') as f:
+
+    with open(args.config, "r") as f:
         cfg = OmegaConf.load(f)
-    
+
     main(cfg)
