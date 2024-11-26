@@ -70,7 +70,7 @@ val_interval: 3
 threshold: 0.5
 
 # checkpoint 저장 경로
-save_dir: ./checkpoints/gray_scale_2048
+save_dir: ./checkpoints/base
 
 # wandb
 api_key: kgs_API_KEY
