@@ -20,7 +20,6 @@ from torch.utils.data import DataLoader
 from loss.loss_selector import LossSelector
 from scheduler.scheduler_selector import SchedulerSelector
 from models.model_selector import ModelSelector
-from lion_pytorch import Lion
 
 
 warnings.filterwarnings('ignore')
