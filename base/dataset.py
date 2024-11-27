@@ -147,7 +147,8 @@ class XRayDataset(Dataset):
 
         image = torch.from_numpy(image).float()
         label = torch.from_numpy(label).float()
-        label = label[self.label_slice, :, :]
+        if self.label_slice is not None:
+            label = label[self.label_slice, :, :]
 
         return image, label
 
