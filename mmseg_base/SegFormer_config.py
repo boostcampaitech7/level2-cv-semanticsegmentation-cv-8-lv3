@@ -132,6 +132,7 @@ def get_segformer_config(backbone='b3', img_size=1536, lr=0.00006, max_iters=400
     
     return config
 
+
 """
 # 사용 예시
 1. SegFormer B0 모델 설정 (이미지 크기 2048)
