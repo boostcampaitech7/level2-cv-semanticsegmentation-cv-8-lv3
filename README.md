@@ -1,6 +1,6 @@
 
 #  🌏 Project Abstract
-![image](https://github.com/user-attachments/assets/792e15e5-c409-4323-8f88-77f426110670)
+![image](https://aistages-api-public-prod.s3.amazonaws.com/app/Files/92123779-aeca-4f97-bbda-ea5591ab9860.png)
 
 
 뼈는 우리 몸의 구조와 기능에 중요한 영향을 미치기 때문에, 정확한 뼈 분할은 의료 진단 및 치료 계획을 개발하는 데 필수적입니다.
