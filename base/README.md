@@ -1,4 +1,4 @@
-# 🚀 Ultralytics Custom Semantic Segmentation Project
+# 🚀 BASE Semantic Segmentation Project
 
 이 저장소는 **Boostcamp AI Tech 7기**의 Semantic Segmentation 팀 프로젝트로, Ultralytics 기반의 커스텀 Semantic Segmentation을 구현하고 실험한 결과를 공유합니다.  
 최신 기술과 팀워크를 결합하여 고성능 모델을 개발하고, 이를 활용한 다양한 문제 해결 사례를 탐구합니다.  
@@ -26,7 +26,7 @@
 ### 1️⃣ 설치
 ```bash
 git clone https://github.com/boostcampaitech7/level2-cv-semanticsegmentation-cv-8-lv3.git
-cd level2-cv-semanticsegmentation-cv-8-lv3/Ultralytics
+cd level2-cv-semanticsegmentation-cv-8-lv3/base
 pip install -r requirements.txt
 ```
 
