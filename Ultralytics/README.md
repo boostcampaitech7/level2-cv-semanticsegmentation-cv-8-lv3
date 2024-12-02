@@ -2,10 +2,7 @@
 
 ## 🌟 주요 기능
 
-- **Ultralytics YOLOv8**: 최신 Ultralytics 라이브러리를 활용한 Semantic Segmentation 지원
-- **커스텀 데이터셋**: 사용자 정의 데이터셋 학습 및 평가
-- **모델 성능 향상**: 다양한 기법을 활용한 모델 최적화 및 실험
-- **손쉬운 확장**: 코드 구조의 유연성을 통해 추가 기능 및 모델 개발 가능
+- **Ultralytics YOLOv11**: 최신 Ultralytics 라이브러리를 활용한 Semantic Segmentation 지원
 
 ## 🚀 시작하기
 
