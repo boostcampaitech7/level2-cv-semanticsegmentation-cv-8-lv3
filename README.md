@@ -1,7 +1,6 @@
+# 🌏 Project Abstract
 
-#  🌏 Project Abstract
 ![image](https://aistages-api-public-prod.s3.amazonaws.com/app/Files/92123779-aeca-4f97-bbda-ea5591ab9860.png)
-
 
 뼈는 우리 몸의 구조와 기능에 중요한 영향을 미치기 때문에, 정확한 뼈 분할은 의료 진단 및 치료 계획을 개발하는 데 필수적입니다.
 Bone Segmentation은 인공지능 분야에서 중요한 응용 분야 중 하나로, 특히, 딥러닝 기술을 이용한 뼈 Segmentation은 많은 연구가 이루어지고 있으며, 다양한 목적으로 도움을 줄 수 있습니다.
@@ -12,7 +11,6 @@ Bone Segmentation은 인공지능 분야에서 중요한 응용 분야 중 하�
 4. 의료 교육에서도 활용될 수 있습니다. 의사들은 병태 및 부상에 대한 이해를 높이고 수술 계획을 개발하는 데 필요한 기술을 연습할 수 있습니다.
 
 <br />
-
 
 <br />
 
@@ -34,22 +32,24 @@ Bone Segmentation은 인공지능 분야에서 중요한 응용 분야 중 하�
 <br />
 
 ## 🗓️ Project Schedule
-  2024/11/13 ~ 2024/11/28
-  
+
+2024/11/13 ~ 2024/11/28
+
 <br />
 
 ## 🚀 Commit Convention
 
-| Type       | Description            |
-|------------|------------------------|
-| `Feat`  | **새로운 기능을 추가**      |
-| `Fix`      | **버그 수정**            |
-| `Refactor` | **코드 리팩토링**         |
-| `Experiment` | **실험용 코드**          |
-| `Comment`  | **주석 추가 및 수정**     |
-| `Remove`  | **파일을 삭제하는 작업만 수행한 경우**     |
+| Type         | Description                            |
+| ------------ | -------------------------------------- |
+| `Feat`       | **새로운 기능을 추가**                 |
+| `Fix`        | **버그 수정**                          |
+| `Refactor`   | **코드 리팩토링**                      |
+| `Experiment` | **실험용 코드**                        |
+| `Comment`    | **주석 추가 및 수정**                  |
+| `Remove`     | **파일을 삭제하는 작업만 수행한 경우** |
 
 #### Example
+
 ```shell
 git commit -m "[#issue] Feature : message content"
 ```
@@ -59,7 +59,7 @@ git commit -m "[#issue] Feature : message content"
 ## 📂 Directory Structure
 
 ```
-├── 📄 .github          
+├── 📄 .github
 ├── 📄 .gitmodules
 ├── 📁 EDA/               # 데이터 탐색 코드
 ├── 📁 Ultralytics/       # YOLO 모델 관련 코드
@@ -75,13 +75,13 @@ git commit -m "[#issue] Feature : message content"
 
 ### Public - Rank 19th **dice : 0.9725**
 
-*1st. dice : 0.9759*
+_1st. dice : 0.9759_
 
 <img width="608" alt="image" src="https://github.com/user-attachments/assets/d7276589-bea6-4d45-a32d-11640bb486d2">
 
 ### Private - 19th **dice : 0.9738**
 
-*1st. dice : 0.9771*
+_1st. dice : 0.9771_
 
 <img width="595" alt="image" src="https://github.com/user-attachments/assets/425f4364-39aa-4923-ab78-de4686114cd0">
 
@@ -91,13 +91,14 @@ git commit -m "[#issue] Feature : message content"
 
 ## 📊 Final Performance Evaluation
 
-| Architecture       | Encoder | LB Score |
-|------------|---------------|--------------|
-| UNet | EfficientNet-b7        | 0.9734         |
-| UNet++ | HRNet_w64        | 0.9738         |
-| UNet | ResNet50        | 0.9738         |
+| Architecture | Encoder         | LB Score |
+| ------------ | --------------- | -------- |
+| UNet         | EfficientNet-b7 | 0.9734   |
+| UNet++       | HRNet_w64       | 0.9738   |
+| UNet         | ResNet50        | 0.9738   |
 
 **UNet**은 대칭적인 U자 형태의 구조로, Encoder-Decoder 간의 Skip Connection을 통해 고해상도의 세밀한 특징을 효과적으로 보존할 수 있어 뼈와 같은 정밀한 구조를 추출하는 데 적합해서 선정되었습니다.
+
 - **EfficientNet-B7**: 높은 파라미터 효율성과 강력한 특징 추출 능력으로, UNet 구조와 결합 시 연산 효율성과 정확도를 동시에 향상시켜주었습니다.
 - **HRNet_W64**: 다양한 해상도에서의 정보를 유지하며 복합적인 세부 사항을 추출할 수 있어 UNet++과 함께 세밀한 특징을 효과적으로 학습합니다.
 - **ResNet50**: 깊은 Residual 구조로 강력하고 안정적인 학습을 가능하게 하며, UNet과 결합해 균형 잡힌 성능을 제공합니다.
@@ -108,18 +109,21 @@ git commit -m "[#issue] Feature : message content"
 
 ### Hard Voting
 
-| Target       | LB Score       |
-|-------------|-------------|
-| ResNet + Efficient + HRNet     | 0.9735     |
-| ResNet + Efficient     | 0.9738     |
-| YOLO + Efficient(Soft Ensembled)     | 0.9689     |
-
-
+| Target                           | LB Score |
+| -------------------------------- | -------- |
+| ResNet + Efficient + HRNet       | 0.9735   |
+| ResNet + Efficient               | 0.9738   |
+| YOLO + Efficient(Soft Ensembled) | 0.9689   |
 
 ### Soft Voting
 
-| Target       | LB Score       |
-|-------------|-------------|
-| Efficient Fold 1,2,3,4,5     | 0.9734     |
-| HRNet Fold 1,2,3,4,5     | 0.9738     |
+| Target                   | LB Score |
+| ------------------------ | -------- |
+| Efficient Fold 1,2,3,4,5 | 0.9734   |
+| HRNet Fold 1,2,3,4,5     | 0.9738   |
 
+<br />
+
+## 👥 Team Notion
+
+AI Tech 7th - CV 8조 [ 🌏 여름엔 쪼꼬만두 호두베리찐빵 ](https://wooden-factory-ab0.notion.site/13bd0190499e8023b53ad9712dfc0a44?pvs=4)
