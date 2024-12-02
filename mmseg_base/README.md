@@ -24,7 +24,7 @@
 ### 1️⃣ 설치
 ```bash
 git clone https://github.com/boostcampaitech7/level2-cv-semanticsegmentation-cv-8-lv3.git
-cd level2-cv-semanticsegmentation-cv-8-lv3/Ultralytics
+cd level2-cv-semanticsegmentation-cv-8-lv3/mmseg_base
 pip install -r requirements.txt
 ```
 
@@ -50,7 +50,7 @@ python train.py --config configs/train_config.yaml
 | SegFormer    | Mit-B5  | 0.9662  | input 이미지 사이즈 = 1024x1024               |
 
 
-## 🔧 개발 환경
+## 🛠️ 개발 환경
 - Python 3.9+
 - PyTorch 2.0
 - MMSegmentation SegFormer
