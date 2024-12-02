@@ -5,13 +5,29 @@
 
 ## 📂 프로젝트 구조
 ```
-├── datasets/      # 데이터셋 관련 스크립트 및 설정 파일
-├── models/        # 커스텀 모델 정의 및 설정
-├── configs/       # 학습 및 실험 설정 파일
-├── utils/         # 유틸리티 함수 및 도구
-├── results/       # 실험 결과 및 시각화
+├── configs/          # train에 사용되는 config files
+├── constants.py      # 데이터셋 관련 기본 path, label 설정 파일
+├── evaluator.py      # 평가지표인 dice class 파일
+├── inference.py      # output csv generation
+├── process_data.py   # multi-label 관련 class register 
+├── setup.sh          # mmsegmentation 관련 package 설치
+├── train.py          # model train script
+├── setup.sh          # mmsegmentation 관련 package 설치
+├── utils.py          # multi label 관련 process
+├── xray.py           # xray dataset class
 └── README.md      # 프로젝트 소개 문서
 ```
+```
+setup
+╭─ 💁 root at 💻 instance-13559 in 📁 ~/.../level2-cv-semanticsegmentation-cv-8-lv3/mmseg_base on (🌿 refactor/mmsegmentation •4 ⌀2 ✗) ╰λ ./setup.sh 
+
+train
+python train.py config_path
+
+inference
+python inference.py config_path --checkpoint checkpoint_path
+```
+
 
 ## 🌟 주요 기능
 - **MMSegmentation SegFormer**: 최신 MMSegmentation 라이브러리를 활용한 Semantic Segmentation 지원
