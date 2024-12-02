@@ -17,6 +17,7 @@
 ├── xray.py           # xray dataset class
 └── README.md      # 프로젝트 소개 문서
 ```
+## 💻 Setup, base train, inference command
 ```
 setup
 ╭─ 💁 root at 💻 instance-13559 in 📁 ~/.../level2-cv-semanticsegmentation-cv-8-lv3/mmseg_base on (🌿 refactor/mmsegmentation •4 ⌀2 ✗) ╰λ ./setup.sh 
