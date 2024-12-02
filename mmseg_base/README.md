@@ -59,7 +59,7 @@ python train.py --config configs/train_config.yaml
 ## 📊 성능
 | Architecture               | Encoder      | LB Score   | 비고                     |
 |--------------------|--------------|--------|--------------------------|
-| SegFormer    | Mit-B3 (base) | 0.9451  | Input 이미지 사이즈 = 512x512               |
+| SegFormer    | Mit-B3 | 0.9451  | Input 이미지 사이즈 = 512x512               |
 | SegFormer    | Mit-B4 | 0.9598 | input 이미지 사이즈 = 1024x1024          |
 | SegFormer    | Mit-B3  | 0.9685 | input 이미지 사이즈 = 1536x1536              |
 | SegFormer    | Mit-B3  | 0.9370 | input 이미지 사이즈 = 1536x1536, inference 이미지 사이즈: 2048x2048                |
