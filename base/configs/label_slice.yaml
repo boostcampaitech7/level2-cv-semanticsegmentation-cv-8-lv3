@@ -1,0 +1,80 @@
+# data 관련 설정
+image_root: /data/ephemeral/home/data/train/DCM
+label_root: /data/ephemeral/home/data/train/outputs_json
+
+# 모델명 및 사전 학습 여부
+model_name: base # 여기 부분은 필요 없음
+model_parameter:
+  arch: unet
+  encoder_name: efficientnet-b7
+  in_channels : 3
+  label_slice: [26]
+  classes: 1 
+
+# amp 사용 여부
+amp: True
+
+# batch_size
+train_batch_size: 4
+val_batch_size: 4
+
+# image resize
+image_size: &image_size 1024
+
+# transform 관련
+transform:
+  Resize:
+    width: *image_size
+    height: *image_size
+  # Rotate:
+  #   limit: [-10, 10]
+  #   p: 0.5
+  # HorizontalFlip:
+  #   p: 0.3
+  # CLAHE:
+  #   clip_limit: 4.0
+
+# 학습 관련 하이퍼파라미터
+lr: 1e-3
+weight_decay: 1e-6
+
+max_epoch: &max_epoch 100 
+early_stopping_patience: 3
+
+# loss 관련 설정
+loss_name: JaccardLoss
+
+# loss에 필요한 parameter -> dict 형태로 작성
+loss_parameter: {}
+
+# scheduler 관련 설정
+# scheduler_name: ReduceLROnPlateau
+
+# # scheduler 필요한 parameter -> dict 형태로 작성
+# scheduler_parameter:
+#   factor: 0.1
+#   mode: max
+#   patience: 5
+#   min_lr: 1e-6
+
+scheduler_name: CosineAnnealingLR
+scheduler_parameter:
+  T_max: 100
+  eta_min: 1e-6
+
+# random seed값
+seed: 42
+
+# validation 관련 인자
+val_fold: 0
+val_interval: 3
+threshold: 0.5
+
+# checkpoint 저장 경로
+save_dir: ./checkpoints/label_slice/${model_parameter.label_slice[0]}
+
+# wandb
+api_key: mpark_API_KEY
+team_name: tjwlssla1-gachon-university
+project_name: label_slice
+experiment_detail: base, label_slice

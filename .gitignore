@@ -1,0 +1,25 @@
+# 모델 checkpoint 제외
+*.pt
+*.pkl
+*.pth
+
+# python cache 제외
+__pycache__
+*.pyc
+*.pyd
+
+# editor settings
+.idea
+.vscode
+.DS_Store
+
+# output 제외
+*.csv
+*.jpg
+*.png
+*.json
+
+# wandb
+wandb/
+mmseg_base/work-dirs/
+mmseg_base/__pycache__/
